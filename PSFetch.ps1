@@ -259,10 +259,10 @@ else {
 # ===== MEMORY =====
 $strings.memory = if ($configuration.HasFlag([Configuration]::Show_Memory)) {
     $m = Get-CimInstance -ClassName Win32_OperatingSystem
-    $total = [math]::Floor(($m.TotalVisibleMemorySize / 1kb))
-    $totalv = [math]::Floor(($m.TotalVirtualMemorySize / 1kb))
-    $usedv = [math]::Floor((($m.TotalVisibleMemorySize - $m.FreeVirtualMemory) / 1kb))
-    $used = [math]::Floor((($m.TotalVirtualMemorySize - $m.FreePhysicalMemory) / 1kb))
+    $total = [math]::Floor($m.TotalVisibleMemorySize / 1kb)
+    $totalv = [math]::Floor(($m.TotalVirtualMemorySize - $m.TotalVisibleMemorySize) / 1kb)
+    $used = [math]::Floor((($m.TotalVisibleMemorySize - $m.FreePhysicalMemory) / 1kb))
+    $usedv = [math]::Floor((($m.TotalVirtualMemorySize - $m.TotalVisibleMemorySize - $m.FreeVirtualMemory + $m.FreePhysicalMemory) / 1kb))
     ("{0} MiB / {1} MiB [{2} MiB / {3} MiB]" -f $used, $total, $usedv, $totalv)
 }
 else {
