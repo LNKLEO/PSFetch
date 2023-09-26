@@ -91,7 +91,6 @@ if ($genconf.IsPresent) {
 # ===== VARIABLES =====
 $disabled = 'disabled'
 $strings = @{
-    ip_address = ''
     dashes     = ''
     img        = ''
     title      = ''
@@ -99,7 +98,6 @@ $strings = @{
     hostname   = ''
     username   = ''
     computer   = ''
-    uptime     = ''
     terminal   = ''
     cpu        = ''
     gpu        = ''
@@ -107,9 +105,6 @@ $strings = @{
     disk_c     = ''
     pwsh       = ''
     pkgs       = ''
-    admin      = ''
-    connection = ''
-    battery    = ''
     kernel     = ''
 }
 
@@ -121,7 +116,6 @@ enum Configuration {
     Show_Dashes = 2
     Show_OS = 4
     Show_Computer = 8
-    Show_Uptime = 16
     Show_Terminal = 32
     Show_CPU = 64
     Show_GPU = 128
@@ -197,23 +191,6 @@ else {
     $disabled
 }
 
-
-# ===== UPTIME =====
-$strings.uptime = if ($configuration.HasFlag([Configuration]::Show_Uptime)) {
-    $(switch ((Get-Date) - (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime) {
-        ({ $PSItem.Days -eq 1 }) { '1 day' }
-        ({ $PSItem.Days -gt 1 }) { "$($PSItem.Days) days" }
-        ({ $PSItem.Hours -eq 1 }) { '1 hour' }
-        ({ $PSItem.Hours -gt 1 }) { "$($PSItem.Hours) hours" }
-        ({ $PSItem.Minutes -eq 1 }) { '1 minute' }
-        ({ $PSItem.Minutes -gt 1 }) { "$($PSItem.Minutes) minutes" }
-        }) -join ' '
-}
-else {
-    $disabled
-}
-
-
 # ===== TERMINAL =====
 # this section works by getting
 # the parent processes of the
@@ -281,11 +258,6 @@ else {
     $disabled
 }
 
-# ===== Running as Admin ? =====
-$current_thread = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-
-$strings.admin = $current_thread.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
 # ===== POWERSHELL VERSION =====
 $strings.pwsh = if ($configuration.HasFlag([Configuration]::Show_Pwsh)) {
     "PowerShell $($PSVersionTable.PSVersion)"
@@ -294,54 +266,8 @@ else {
     $disabled
 }
 
-# ===== CONNECTION CHECKER =====
-function Get-Status {
-    $adaptor = (Test-NetConnection -WarningAction silentlycontinue)
-    $status = 'Offline'
-    if ($adaptor.PingSucceeded) {
-
-        $interface_alias = $adaptor.InterfaceAlias
-        $suffix = ""
-
-        if ($interface_alias.Length -gt 0) {
-            $suffix = "($($interface_alias))"
-        }
-
-        $connection_name = Get-NetIPConfiguration
-        $status = "$($connection_name.NetProfile.Name) $($suffix)"
-    }
-    return $status
-}
-
-$strings.connection = Get-Status
-
-# ===== IP Address =====
-
-function Get-LocalIPAddress {
-    $address = "Couldn't detect"
-    if ($strings.connection -ne 'Offline') {
-        $address = (Invoke-WebRequest -uri "https://api.ipify.org/").Content
-    }
-    return $address
-}
-
-$strings.ip_address = Get-LocalIpAddress
-
 # ===== Kernel Version =====
 $strings.kernel = [Environment]::OSVersion.Version.ToString()
-
-# ===== Battery =====
-function Get-ConnectionStatus {
-    $charging_state = (Get-CimInstance win32_battery).batterystatus
-    if ($charging_state -eq 2) {
-        return 'Connected'
-    }
-    else {
-        return 'Unplugged'
-    }
-}
-$connection_sign = Get-ConnectionStatus
-$strings.battery = (Get-CimInstance -ClassName Win32_Battery | Select-Object -ExpandProperty EstimatedChargeRemaining).ToString() + "% [" + $connection_sign + "]"
 
 # ===== PACKAGES =====
 function Get-PackageManager {
@@ -378,7 +304,6 @@ $info.Add(@("", $strings.dashes))
 $info.Add(@("OS", $strings.os))
 $info.Add(@("Kernel Version", $strings.kernel))
 $info.Add(@("Host", $strings.computer))
-$info.Add(@("Uptime", $strings.uptime))
 $info.Add(@("Packages", $strings.pkgs))
 $info.Add(@("Shell", $strings.pwsh))
 $info.Add(@("Terminal", $strings.terminal))
@@ -386,10 +311,6 @@ $info.Add(@("CPU", $strings.cpu))
 $info.Add(@("GPU", $strings.gpu))
 $info.Add(@("Memory", $strings.memory))
 $info.Add(@("Disk (C:)", $strings.disk_c))
-$info.Add(@("Running as Admin", $strings.admin))
-$info.Add(@("Internet Access", $strings.connection))
-$info.Add(@("IP Address", $strings.ip_address))
-$info.Add(@("Power", $strings.battery))
 $info.Add(@("", ""))
 $info.Add(@("", $colorBar))
 
