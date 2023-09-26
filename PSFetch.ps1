@@ -48,6 +48,8 @@ $colorBar = ('{0}[0;40m{1}{0}[0;41m{1}{0}[0;42m{1}{0}[0;43m{1}' +
     '{0}[0;44m{1}{0}[0;45m{1}{0}[0;46m{1}{0}[0;47m{1}' +
     '{0}[0m') -f $e, '   '
 
+$units = ('','KiB', 'MiB', 'GiB', 'TiB')
+
 $is_pscore = if ($PSVersionTable.PSEdition.ToString() -eq 'Core') {
     $true
 }
@@ -91,21 +93,22 @@ if ($genconf.IsPresent) {
 # ===== VARIABLES =====
 $disabled = 'disabled'
 $strings = @{
-    dashes     = ''
-    img        = ''
-    title      = ''
-    os         = ''
-    hostname   = ''
-    username   = ''
-    computer   = ''
-    terminal   = ''
-    cpu        = ''
-    gpu        = ''
-    memory     = ''
-    disk_c     = ''
-    pwsh       = ''
-    pkgs       = ''
-    kernel     = ''
+    dashes   = ''
+    img      = ''
+    title    = ''
+    os       = ''
+    hostname = ''
+    username = ''
+    computer = ''
+    terminal = ''
+    cpu      = ''
+    gpu      = ''
+    memory   = ''
+    volumesum  = ''
+    volumes  = @()
+    pwsh     = ''
+    pkgs     = ''
+    kernel   = ''
 }
 
 # ===== CONFIGURATION =====
@@ -120,7 +123,7 @@ enum Configuration {
     Show_CPU = 64
     Show_GPU = 128
     Show_Memory = 256
-    Show_Disk = 512
+    Show_Volumes = 512
     Show_Pwsh = 1024
     Show_Pkgs = 2048
 }
@@ -128,7 +131,7 @@ enum Configuration {
     . $config
 }
 else {
-    0xFFF
+    0xFEF
 }
 
 # ===== OS =====
@@ -236,23 +239,55 @@ else {
 # ===== MEMORY =====
 $strings.memory = if ($configuration.HasFlag([Configuration]::Show_Memory)) {
     $m = Get-CimInstance -ClassName Win32_OperatingSystem
-    $total = [math]::Floor($m.TotalVisibleMemorySize / 1kb)
-    $totalv = [math]::Floor(($m.TotalVirtualMemorySize - $m.TotalVisibleMemorySize) / 1kb)
-    $used = [math]::Floor((($m.TotalVisibleMemorySize - $m.FreePhysicalMemory) / 1kb))
-    $usedv = [math]::Floor((($m.TotalVirtualMemorySize - $m.TotalVisibleMemorySize - $m.FreeVirtualMemory + $m.FreePhysicalMemory) / 1kb))
-    ("{0} MiB / {1} MiB [{2} MiB / {3} MiB]" -f $used, $total, $usedv, $totalv)
+    $total = [double]($m.TotalVisibleMemorySize) * 1024
+    $htotal = $total
+    $totalv = [double]($m.TotalVirtualMemorySize - $m.TotalVisibleMemorySize) * 1024
+    $htotalv = $totalv
+    $unit = 0
+    while ($htotal-gt 999) {
+        $htotal /= 1024
+        $htotalv /= 1024
+        ++ $unit
+    }
+    $htotal = $htotal.ToString("N3").Substring(0,5)
+    $htotalv = $htotalv.ToString("N3").Substring(0,5)
+    $unit = $units[$unit]
+    ("{0}[+{1}] {2} ({3}[+{4}])" -f $htotal, $htotalv, $unit, $total.ToString("N0"), $totalv.ToString("N0"))
 }
 else {
     $disabled
 }
 
-# ===== DISK USAGE C =====
-$strings.disk_c = if ($configuration.HasFlag([Configuration]::Show_Disk)) {
-    $disk = Get-CimInstance -ClassName Win32_LogicalDisk -Filter 'DeviceID="C:"'
-    $total = [math]::Floor(($disk.Size / 1mb))
-    $used = [math]::Floor((($disk.Size - $disk.FreeSpace) / 1mb))
-    $usage = [math]::Round(($used / $total * 100), 2)
-    ("{0} MiB / {1} MiB ({2}%)" -f $used, $total, $usage)
+# ===== Volumes =====
+$strings.volumes = if ($configuration.HasFlag([Configuration]::Show_Volumes)) {
+    $capsum=0
+    Get-CimInstance -ClassName Win32_Volume | Foreach-Object {
+        $cap = $_.Capacity
+        $hcap = [double]$cap
+        $capsum += $hcap
+        $unit = 0
+        while ($hcap -gt 999) {
+            $hcap /= 1024
+            ++ $unit
+        }
+        $hcap = $hcap.ToString("N3").Substring(0,5)
+        $unit = $units[$unit]
+        $mount = $_.Name.Trim("\")
+        if ($mount.StartsWith("?")) {
+            $mount = "\\?\"
+        }
+        $label = $_.Label
+        @(,@(("> {0} [{1}]" -f $label, $mount), ("{0} {1} ({2})" -f $hcap, $unit, $cap.ToString("N0"))))
+    }
+    $hcap = $capsum
+    $unit = 0
+    while ($hcap -gt 999) {
+        $hcap /= 1024
+        ++ $unit
+    }
+    $hcap = $hcap.ToString("N3").Substring(0,5)
+    $unit = $units[$unit]
+    $strings.volumesum = "{0} {1} ({2})" -f $hcap, $unit, $capsum.ToString("N0")
 }
 else {
     $disabled
@@ -310,7 +345,10 @@ $info.Add(@("Terminal", $strings.terminal))
 $info.Add(@("CPU", $strings.cpu))
 $info.Add(@("GPU", $strings.gpu))
 $info.Add(@("Memory", $strings.memory))
-$info.Add(@("Disk (C:)", $strings.disk_c))
+$info.Add(@("Volumes", $strings.volumesum))
+foreach ($Volume in $strings.volumes) {
+    $info.Add($Volume)
+}
 $info.Add(@("", ""))
 $info.Add(@("", $colorBar))
 
