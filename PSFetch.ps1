@@ -49,8 +49,8 @@ $er = "$ee$e[1;31m"
 $eg = "$ee$e[1;32m"
 $eb = "$ee$e[1;34m"
 $ey = "$ee$e[1;33m"
-$et = "$ee$e[1;35m"
-$eh = "$ee$e[1;46m"
+$et = "$ee$e[1;36m"
+$eh = "$ee$e[1;47m"
 
 $colorBar = ('{0}[0;40m{1}{0}[0;41m{1}{0}[0;42m{1}{0}[0;43m{1}' +
     '{0}[0;44m{1}{0}[0;45m{1}{0}[0;46m{1}{0}[0;47m{1}' +
@@ -178,7 +178,7 @@ $strings.username = [Environment]::UserName
 
 # ===== TITLE =====
 $strings.title = if ($configuration.HasFlag([Configuration]::Show_Title)) {
-    "${e}[1;36m{0}${e}[0m@${e}[1;35m{1}${e}[0m" -f $strings['username', 'hostname']
+    "${e}[1;37m{0}${e}[0m@${e}[1;36m{1}${e}[0m" -f $strings['username', 'hostname']
 }
 else {
     $disabled
