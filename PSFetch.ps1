@@ -101,24 +101,24 @@ if ($genconf.IsPresent) {
 # ===== VARIABLES =====
 $disabled = 'disabled'
 $strings = @{
-    dashes       = ''
-    img          = ''
-    title        = ''
-    os           = ''
-    hostname     = ''
-    username     = ''
-    computer     = ''
-    uptime       = ''
-    terminal     = ''
-    cpu          = ''
-    gpu          = ''
-    memory       = ''
-    volumesum    = ''
-    volumes      = @()
-    pwsh         = ''
-    pkgs         = ''
-    kernel       = ''
-    refresh_rate = ''
+    dashes    = ''
+    img       = ''
+    title     = ''
+    os        = ''
+    hostname  = ''
+    username  = ''
+    computer  = ''
+    uptime    = ''
+    terminal  = ''
+    cpu       = ''
+    gpu       = ''
+    memory    = ''
+    volumesum = ''
+    volumes   = @()
+    pwsh      = ''
+    pkgs      = ''
+    kernel    = ''
+    display   = ''
 }
 
 # ===== CONFIGURATION =====
@@ -217,13 +217,18 @@ $strings.uptime = if ($configuration.HasFlag([Configuration]::Show_Uptime)) {
     $disabled
 }
 
-# ======= Refresh Rate =======
+# ======= Display =======
 
-function Get-RefreshRate {
-    return "$((Get-CimInstance -ClassName Win32_VideoController | Select-Object -Property CurrentRefreshRate).CurrentRefreshRate)Hz"
+function Get-Display {
+    $DISPLAY = $(Get-CimInstance -ClassName Win32_VideoController)
+    if(($DISPLAY.MinRefreshRate -ne $null) -and ($DISPLAY.MaxRefreshRate -ne $null) -and ($DISPLAY.MinRefreshRate -ne $DISPLAY.MaxRefreshRate)) {
+        return '{0} × {1} × {2} bits @ {3}Hz ({4} ~ {5}Hz)' -f $DISPLAY.CurrentHorizontalResolution, $DISPLAY.CurrentVerticalResolution, $DISPLAY.CurrentBitsPerPixel, $DISPLAY.CurrentRefreshRate, $DISPLAY.MinRefreshRate, $DISPLAY.MaxRefreshRate
+    } else {
+        return '{0} × {1} × {2} bits @ {3}Hz' -f $DISPLAY.CurrentHorizontalResolution, $DISPLAY.CurrentVerticalResolution, $DISPLAY.CurrentBitsPerPixel, $DISPLAY.CurrentRefreshRate
+    }
 }
 
-$strings.refresh_rate = Get-RefreshRate
+$strings.display = Get-Display
 
 # ===== TERMINAL =====
 # this section works by getting
@@ -261,9 +266,16 @@ else {
 }
 
 $strings.gpu = if ($configuration.HasFlag([Configuration]::Show_GPU)) {
-    ("{0} [{1}]" -f (Get-CimInstance -ClassName Win32_VideoController).Name, (Get-CimInstance -ClassName Win32_VideoController).DriverVersion)
-}
-else {
+    $gram = (Get-CimInstance -ClassName Win32_VideoController).AdapterRAM
+    $unit = 0
+    while ($gram -gt 999) {
+        $gram /= 1024
+        ++ $unit
+    }
+    $gram = $gram.ToString("N3").Substring(0,5)
+    $unit = $units[$unit]
+    "{0} [{1} {2}]" -f (Get-CimInstance -ClassName Win32_VideoController).Name, $gram, $unit
+} else {
     $disabled
 }
 
@@ -381,7 +393,7 @@ foreach($card in $strings.gpu) {
         $info.Add(@("GPU (Integrated)", $card))
     }
 }
-$info.Add(@("Refresh Rate", $strings.refresh_rate))
+$info.Add(@("Display", $strings.display))
 $info.Add(@("Memory", $strings.memory))
 $info.Add(@("Volumes", $strings.volumesum))
 foreach ($Volume in $strings.volumes) {
