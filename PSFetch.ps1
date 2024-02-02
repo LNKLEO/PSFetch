@@ -356,7 +356,7 @@ function Get-PackageManager {
         $_pms += 'scoop '
     }
     if ((Get-Command -Name winget -ErrorAction Ignore).Name -eq 'winget.exe') {
-        $_pms += 'winget '
+        $_pms += '{0} [Windows Package Manager {1}]' -f ($(winget list).Length - 2), $(winget --version)
     }
     
     if ((Get-Command -Name choco -ErrorAction Ignore).Name -eq 'choco.exe') {
@@ -367,7 +367,7 @@ function Get-PackageManager {
         return '(none)'
     }
     else {
-        return $_pms.Replace(' ', ', ').TrimEnd(', ')
+        return $_pms.TrimEnd(' ')
     }
 }
 
