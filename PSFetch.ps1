@@ -44,6 +44,7 @@ param(
 
 $e = [char]0x1B
 $ee = "$e[0m"
+$ev = "$ee$e[1;35m"
 $es = "$ee$e[5;37m"
 $er = "$ee$e[1;31m"
 $eg = "$ee$e[1;32m"
@@ -246,7 +247,7 @@ $strings.terminal = if ($configuration.HasFlag([Configuration]::Show_Terminal) -
     try {
         switch ($parent.ProcessName) {
             'explorer' { 'Windows Console' }
-            'WindowsTerminal' { '{0} {1}' -f $(Get-AppxPackage *WindowsTerminal*)[0].Name.Replace("Microsoft.WindowsTerminal","Windows Terminal "), $(Get-AppxPackage *WindowsTerminal*)[0].Version}
+            'WindowsTerminal' { "{0} $ev{1}$ee" -f $(Get-AppxPackage *WindowsTerminal*)[0].Name.Replace("Microsoft.WindowsTerminal","Windows Terminal "), $(Get-AppxPackage *WindowsTerminal*)[0].Version}
             default { $PSItem }
         }
     }
@@ -275,7 +276,7 @@ $strings.gpu = if ($configuration.HasFlag([Configuration]::Show_GPU)) {
     }
     $gram = $gram.ToString("N3").Substring(0,5).TrimEnd(".0")
     $unit = $units[$unit]
-    "{0} ({1} {2}) [{3}]" -f (Get-CimInstance -ClassName Win32_VideoController).Name.Replace("(R)", ""), $gram, $unit, (Get-CimInstance -ClassName Win32_VideoController).DriverVersion
+    "{0} ({1} {2}) $ev{3}$ee" -f (Get-CimInstance -ClassName Win32_VideoController).Name.Replace("(R)", ""), $gram, $unit, (Get-CimInstance -ClassName Win32_VideoController).DriverVersion
 } else {
     $disabled
 }
@@ -339,7 +340,7 @@ else {
 
 # ===== POWERSHELL VERSION =====
 $strings.pwsh = if ($configuration.HasFlag([Configuration]::Show_Pwsh)) {
-    "PowerShell $($PSVersionTable.PSVersion)"
+    "PowerShell $ev$($PSVersionTable.PSVersion)$ee"
 }
 else {
     $disabled
@@ -356,7 +357,7 @@ function Get-PackageManager {
         $_pms += 'scoop '
     }
     if ((Get-Command -Name winget -ErrorAction Ignore).Name -eq 'winget.exe') {
-        $_pms += '{0} [Windows Package Manager {1}]' -f ($(winget list).Length - 2), $(winget --version)
+        $_pms += "{0} [Windows Package Manager $ev{1}$ee]" -f ($(winget list).Length - 2), $(winget --version)
     }
     
     if ((Get-Command -Name choco -ErrorAction Ignore).Name -eq 'choco.exe') {
