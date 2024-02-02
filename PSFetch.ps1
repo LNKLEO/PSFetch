@@ -273,7 +273,7 @@ $strings.gpu = if ($configuration.HasFlag([Configuration]::Show_GPU)) {
         $gram /= 1024
         ++ $unit
     }
-    $gram = $gram.ToString("N3").Substring(0,5)
+    $gram = $gram.ToString("N3").Substring(0,5).TrimEnd(".0")
     $unit = $units[$unit]
     "{0} [{1} {2}]" -f (Get-CimInstance -ClassName Win32_VideoController).Name, $gram, $unit
 } else {
@@ -293,8 +293,8 @@ $strings.memory = if ($configuration.HasFlag([Configuration]::Show_Memory)) {
         $htotalv /= 1024
         ++ $unit
     }
-    $htotal = $htotal.ToString("N3").Substring(0,5)
-    $htotalv = $htotalv.ToString("N3").Substring(0,5)
+    $htotal = $htotal.ToString("N3").Substring(0,5).TrimEnd(".0")
+    $htotalv = $htotalv.ToString("N3").Substring(0,5).TrimEnd(".0")
     $unit = $units[$unit]
     ("{0}[+{1}] {2} ({3}[+{4}])" -f $htotal, $htotalv, $unit, $total.ToString("N0"), $totalv.ToString("N0"))
 }
@@ -314,7 +314,7 @@ $strings.volumes = if ($configuration.HasFlag([Configuration]::Show_Volumes)) {
             $hcap /= 1024
             ++ $unit
         }
-        $hcap = $hcap.ToString("N3").Substring(0,5)
+        $hcap = $hcap.ToString("N3").Substring(0,5).TrimEnd(".0")
         $unit = $units[$unit]
         $mount = $_.Name.Trim("\")
         if ($mount.StartsWith("?")) {
@@ -329,7 +329,7 @@ $strings.volumes = if ($configuration.HasFlag([Configuration]::Show_Volumes)) {
         $hcap /= 1024
         ++ $unit
     }
-    $hcap = $hcap.ToString("N3").Substring(0,5)
+    $hcap = $hcap.ToString("N3").Substring(0,5).TrimEnd(".0")
     $unit = $units[$unit]
     $strings.volumesum = "{0} {1} ({2})" -f $hcap, $unit, $capsum.ToString("N0")
 }
