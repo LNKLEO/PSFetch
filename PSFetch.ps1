@@ -129,7 +129,7 @@ enum Configuration {
     Show_Dashes   = 2
     Show_OS       = 4
     Show_Computer = 8
-    Show_Uptime = 16
+    Show_Uptime   = 16
     Show_Terminal = 32
     Show_CPU      = 64
     Show_GPU      = 128
@@ -246,6 +246,7 @@ $strings.terminal = if ($configuration.HasFlag([Configuration]::Show_Terminal) -
     try {
         switch ($parent.ProcessName) {
             'explorer' { 'Windows Console' }
+            'WindowsTerminal' { '{0} {1}' -f $(Get-AppxPackage *WindowsTerminal*)[0].Name.Replace("Microsoft.WindowsTerminal","Windows Terminal "), $(Get-AppxPackage *WindowsTerminal*)[0].Version}
             default { $PSItem }
         }
     }
