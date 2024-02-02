@@ -389,9 +389,9 @@ $info.Add(@("Terminal", $strings.terminal))
 $info.Add(@("CPU", $strings.cpu))
 foreach($card in $strings.gpu) {
     if ($card.ToUpper() -Match "NVIDIA") {
-        $info.Add(@("GPU (Dedicated)", $card))
+        $info.Add(@("dGPU", $card))
     } else {
-        $info.Add(@("GPU (Integrated)", $card))
+        $info.Add(@("iGPU", $card))
     }
 }
 $info.Add(@("Display", $strings.display))
