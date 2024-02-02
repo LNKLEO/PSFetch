@@ -275,7 +275,7 @@ $strings.gpu = if ($configuration.HasFlag([Configuration]::Show_GPU)) {
     }
     $gram = $gram.ToString("N3").Substring(0,5).TrimEnd(".0")
     $unit = $units[$unit]
-    "{0} [{1} {2}]" -f (Get-CimInstance -ClassName Win32_VideoController).Name, $gram, $unit
+    "{0} ({1} {2}) [{3}]" -f (Get-CimInstance -ClassName Win32_VideoController).Name.Replace("(R)", ""), $gram, $unit, (Get-CimInstance -ClassName Win32_VideoController).DriverVersion
 } else {
     $disabled
 }
