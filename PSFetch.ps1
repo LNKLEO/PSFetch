@@ -101,39 +101,42 @@ if ($genconf.IsPresent) {
 # ===== VARIABLES =====
 $disabled = 'disabled'
 $strings = @{
-    dashes   = ''
-    img      = ''
-    title    = ''
-    os       = ''
-    hostname = ''
-    username = ''
-    computer = ''
-    terminal = ''
-    cpu      = ''
-    gpu      = ''
-    memory   = ''
-    volumesum  = ''
-    volumes  = @()
-    pwsh     = ''
-    pkgs     = ''
-    kernel   = ''
+    dashes       = ''
+    img          = ''
+    title        = ''
+    os           = ''
+    hostname     = ''
+    username     = ''
+    computer     = ''
+    uptime       = ''
+    terminal     = ''
+    cpu          = ''
+    gpu          = ''
+    memory       = ''
+    volumesum    = ''
+    volumes      = @()
+    pwsh         = ''
+    pkgs         = ''
+    kernel       = ''
+    refresh_rate = ''
 }
 
 # ===== CONFIGURATION =====
 [Flags()]
 enum Configuration {
-    None = 0
-    Show_Title = 1
-    Show_Dashes = 2
-    Show_OS = 4
+    None          = 0
+    Show_Title    = 1
+    Show_Dashes   = 2
+    Show_OS       = 4
     Show_Computer = 8
+    Show_Uptime = 16
     Show_Terminal = 32
-    Show_CPU = 64
-    Show_GPU = 128
-    Show_Memory = 256
-    Show_Volumes = 512
-    Show_Pwsh = 1024
-    Show_Pkgs = 2048
+    Show_CPU      = 64
+    Show_GPU      = 128
+    Show_Memory   = 256
+    Show_Volumes  = 512
+    Show_Pwsh     = 1024
+    Show_Pkgs     = 2048
 }
 [Configuration]$configuration = if ((Get-Item -Path $config).Length -gt 0) {
     . $config
@@ -184,7 +187,6 @@ else {
     $disabled
 }
 
-
 # ===== DASHES =====
 $strings.dashes = if ($configuration.HasFlag([Configuration]::Show_Dashes)) {
     -join $(for ($i = 0; $i -lt ('{0}@{1}' -f $strings['username', 'hostname']).Length; $i++) { '-' })
@@ -193,15 +195,35 @@ else {
     $disabled
 }
 
-
 # ===== COMPUTER =====
 $strings.computer = if ($configuration.HasFlag([Configuration]::Show_Computer)) {
     $compsys = Get-CimInstance -ClassName Win32_ComputerSystem
     '{0} {1}' -f $compsys.Manufacturer, $compsys.Model
-}
-else {
+} else {
     $disabled
 }
+
+# ===== UPTIME =====
+$strings.uptime = if ($configuration.HasFlag([Configuration]::Show_Uptime)) {
+    $(switch ((Get-Date) - (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime) {
+        ({ $PSItem.Days -eq 1 }) { '1 day' }
+        ({ $PSItem.Days -gt 1 }) { "$($PSItem.Days) days" }
+        ({ $PSItem.Hours -eq 1 }) { '1 hour' }
+        ({ $PSItem.Hours -gt 1 }) { "$($PSItem.Hours) hours" }
+        ({ $PSItem.Minutes -eq 1 }) { '1 minute' }
+        ({ $PSItem.Minutes -gt 1 }) { "$($PSItem.Minutes) minutes" }
+    }) -join ' '
+} else {
+    $disabled
+}
+
+# ======= Refresh Rate =======
+
+function Get-RefreshRate {
+    return "$((Get-CimInstance -ClassName Win32_VideoController | Select-Object -Property CurrentRefreshRate).CurrentRefreshRate)Hz"
+}
+
+$strings.refresh_rate = Get-RefreshRate
 
 # ===== TERMINAL =====
 # this section works by getting
@@ -352,7 +374,14 @@ $info.Add(@("Packages", $strings.pkgs))
 $info.Add(@("Shell", $strings.pwsh))
 $info.Add(@("Terminal", $strings.terminal))
 $info.Add(@("CPU", $strings.cpu))
-$info.Add(@("GPU", $strings.gpu))
+foreach($card in $strings.gpu) {
+    if ($card.ToUpper() -Match "NVIDIA") {
+        $info.Add(@("GPU (Dedicated)", $card))
+    } else {
+        $info.Add(@("GPU (Integrated)", $card))
+    }
+}
+$info.Add(@("Refresh Rate", $strings.refresh_rate))
 $info.Add(@("Memory", $strings.memory))
 $info.Add(@("Volumes", $strings.volumesum))
 foreach ($Volume in $strings.volumes) {

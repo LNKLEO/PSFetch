@@ -6,25 +6,9 @@ DotFetch is a command-line system information utility written in PowerShell for 
 
 ### Compatible with both Windows PowerShell & PowerShell Core
 
-### Windows PowerShell on Windows Terminal
-
-![DotFetch Win](https://github.com/evilprince2009/DotFetch/blob/main/Images/Windows%20Powershell.png)
-
-### PowerShell Core on Windows Terminal
-
-![DotFetch Core](https://github.com/evilprince2009/DotFetch/blob/main/Images/PowerShell%20Core.png)
-
 ### PowerShell Core on Windows Terminal (Windows 11)
 
-![DotFetch Core Win XI](https://github.com/evilprince2009/DotFetch/blob/main/Images/PowerShell%20Core%20Win%2011.png)
-
-### PowerShell Core on Hyper Terminal
-
-![DotFetch Core - Hyper](https://github.com/evilprince2009/DotFetch/blob/main/Images/hyper-pscore.png)
-
-### PowerShell Core on Windows Console
-
-![DotFetch Core - Console](https://github.com/evilprince2009/DotFetch/blob/main/Images/Console%20PSCore.png)
+![DotFetch Core Win XI](https://github.com/evilprince2009/DotFetch/blob/main/Images/win-teriminal-win-xi-pwsh.gif)
 
 ### This is how it looks like
 
@@ -47,4 +31,10 @@ dotfetch
 
 - Re-Launch PowerShell & you are good to go.
 
-#### [Ibne Nahian](https://evilprince2009.netlify.app/)
+## Ibne Nahian
+
+### Hire me for your Web and Automation projects
+
+- #### [Portfolio](https://evilprince2009.netlify.app/)
+- #### [LinkedIn](https://www.linkedin.com/in/evilprince2009/)
+- #### [Upwork](https://www.upwork.com/freelancers/~01ded0be5baccfa296)
