@@ -16,23 +16,23 @@
 #>
 <#
 .SYNOPSIS
-    PSFetch - Neofetch for Windows in PowerShell 5+
+PSFetch - Neofetch for Windows in PowerShell 5+
 .DESCRIPTION
-    PSFetch is a command-line system information utility for Windows written in PowerShell.
+PSFetch is a command-line system information utility for Windows written in PowerShell.
 .PARAMETER image
-    Display a pixelated image instead of the usual logo. Imagemagick required.
+Display a pixelated image instead of the usual logo. Imagemagick required.
 .PARAMETER genconf
-    Download a configuration template. Internet connection required.
+Download a configuration template. Internet connection required.
 .PARAMETER noimage
-    Do not display any image or logo; display information only.
+Do not display any image or logo; display information only.
 .PARAMETER help
-    Display this help message.
+Display this help message.
 .INPUTS
-    System.String
+System.String
 .OUTPUTS
-    System.String[]
+System.String[]
 .NOTES
-    Run PSFetch without arguments to view core functionality.
+Run PSFetch without arguments to view core functionality.
 #>
 [CmdletBinding()]
 param(
@@ -40,10 +40,10 @@ param(
     [switch][alias('g')]$genconf,
     [switch][alias('n')]$noimage,
     [switch][alias('h')]$help
-)
-
-$e = [char]0x1B
-$ee = "$e[0m"
+    )
+    
+    $e = [char]0x1B
+    $ee = "$e[0m"
 $ev = "$ee$e[1;35m"
 $es = "$ee$e[5;37m"
 $er = "$ee$e[1;31m"
@@ -56,7 +56,7 @@ $eh = "$ee$e[1;37;46m"
 $colorBar = ('{0}[0;40m{1}{0}[0;41m{1}{0}[0;42m{1}{0}[0;43m{1}' +
     '{0}[0;44m{1}{0}[0;45m{1}{0}[0;46m{1}{0}[0;47m{1}' +
     '{0}[0m') -f $e, '   '
-
+    
 $units = ('','KiB', 'MiB', 'GiB', 'TiB')
 
 $is_pscore = if ($PSVersionTable.PSEdition.ToString() -eq 'Core') {
@@ -151,26 +151,23 @@ $strings.os = (Get-CimInstance -ClassName CIM_OperatingSystem).Caption.ToString(
 
 # ===== LOGO =====
 $img = @(
-    " $es·$es················$es··$es················$es·$ee ",
-    " $es·$er################$es··$eg################$es·$ee ",
-    " $es·$er################$es··$eg################$es·$ee ",
-    " $es·$er################$es··$eg################$es·$ee ",
-    " $es·$er################$es··$eg################$es·$ee ",
-    " $es·$er################$es··$eg################$es·$ee ",
-    " $es·$er################$es··$eg################$es·$ee ",
-    " $es·$er################$es··$eg################$es·$ee ",
-    " $es·$er################$es··$eg################$es·$ee ",
-    " $es·$es················$es··$es················$es·$ee ",
-    " $es·$es················$es··$es················$es·$ee ",
-    " $es·$eb################$es··$ey################$es·$ee ",
-    " $es·$eb################$es··$ey################$es·$ee ",
-    " $es·$eb################$es··$ey################$es·$ee ",
-    " $es·$eb################$es··$ey################$es·$ee ",
-    " $es·$eb################$es··$ey################$es·$ee ",
-    " $es·$eb################$es··$ey################$es·$ee ",
-    " $es·$eb################$es··$ey################$es·$ee ",
-    " $es·$eb################$es··$ey################$es·$ee ",
-    " $es·$es················$es··$es················$es·$ee "
+    "$es⣿⣿$es⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿$es⣿⣿$es⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿$es⣿⣿$ee",
+    "$es⣿⣿$er⢰⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⡆$es⣿⣿$eg⢰⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⡆$es⣿⣿$ee",
+    "$es⣿⣿$er⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$eg⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$er⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$eg⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$er⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$eg⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$er⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$eg⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$er⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$eg⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$er⠸⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠇$es⣿⣿$eg⠸⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠇$es⣿⣿$ee",
+    "$es⣿⣿$es⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿$es⣿⣿$es⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿$es⣿⣿$ee",
+    "$es⣿⣿$eb⢰⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⡆$es⣿⣿$ey⢰⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⡆$es⣿⣿$ee",
+    "$es⣿⣿$eb⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ey⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$eb⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ey⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$eb⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ey⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$eb⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ey⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$eb⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ey⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇$es⣿⣿$ee",
+    "$es⣿⣿$eb⠸⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠇$es⣿⣿$ey⠸⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠇$es⣿⣿$ee",
+    "$es⣿⣿$es⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿$es⣿⣿$es⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿$es⣿⣿$ee"
 )
 
 # ===== HOSTNAME =====
@@ -219,7 +216,6 @@ $strings.uptime = if ($configuration.HasFlag([Configuration]::Show_Uptime)) {
 }
 
 # ======= Display =======
-
 function Get-Display {
     $DISPLAY = $(Get-CimInstance -ClassName Win32_VideoController)
     if(($DISPLAY.MinRefreshRate -ne $null) -and ($DISPLAY.MaxRefreshRate -ne $null) -and ($DISPLAY.MinRefreshRate -ne $DISPLAY.MaxRefreshRate)) {
@@ -375,7 +371,7 @@ function Get-PackageManager {
 $strings.pkgs = Get-PackageManager
 
 # Reset terminal sequences and display a newline
-Write-Output "${e}[0m"
+# Write-Output "${e}[0m"
 
 # Add system info into an array
 $info = [collections.generic.list[string[]]]::new()
@@ -416,11 +412,11 @@ while ($counter -lt $info.Count) {
     else {
         ": $($info[$counter][1])"
     }
-
+    
     if ($item_content -notlike '*disabled') {
         " ${logo_line}$e[42G${item_title}${item_content}"
     }
-
+    
     $counter++
     if ($item_content -notlike '*disabled') {
         $logoctr++
@@ -429,14 +425,12 @@ while ($counter -lt $info.Count) {
 
 # Print the rest of the logo
 if ($logoctr -lt $img.Count) {
-    while ($logoctr -le $img.Count) {
+    while ($logoctr -lt $img.Count) {
         " $($img[$logoctr])"
         $logoctr++
     }
 }
-
 # Print a newline
-write-output ''
 
 # Compatible with both Windows PowerShell & PowerShell Core
 # Author: Ibne Nahian (@evilprince2009)
